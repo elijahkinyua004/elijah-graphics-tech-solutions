@@ -1,11 +1,1 @@
-{
-  "name": "elijah-portfolio",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "cloudinary": "^2.10.0"
-  }
-}
+{"name":"elijah-portfolio","version":"1.0.0","private":true}
