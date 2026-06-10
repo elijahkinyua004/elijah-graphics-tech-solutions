@@ -308,7 +308,7 @@ async function serveStaticFile(req, res) { // Optimization: Serve static files
     }
 }
 
-const server = http.createServer(async (req, res) => {
+module.exports = async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname.replace(/\/$/, '') || '/';
 
@@ -352,8 +352,4 @@ const server = http.createServer(async (req, res) => {
     sendJson(res, 405, { message: 'Method not allowed.' }); // Optimization: Handle unsupported methods
 });
 
-ensureStorage().then(() => {
-    server.listen(PORT, () => {
-        console.log(`Portfolio running at http://localhost:${PORT}`);
-    });
-});
+ensureStorage();
