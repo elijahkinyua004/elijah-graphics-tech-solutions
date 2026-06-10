@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Gallery | Elijah Graphics & Tech Solutions</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #050816;
+      color: white;
+      padding: 0;
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto; /* Allow scrolling if content is taller than screen */
+      overflow-x: hidden;
+    }
+
+    .gallery-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center; 
+      padding: 15px 5%;
+      gap: 15px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+      z-index: 1000; /* Higher than slideshow */
+      box-sizing: border-box;
+    }
+    .gallery-header h2 {
+      margin: 0;
+      color: #00f7ff;
+      font-size: 1.8rem;
+      font-weight: 800;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .back-button {
+      padding: 14px 28px; /* Much larger tap area for mobile */
+      background: #ff00c8;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s ease;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      z-index: 1001;
+    }
+    .back-button:hover {
+      background: #e000b0;
+    }
+
+    /* Fixed Upload Button (Hidden Gear) */
+    .upload-trigger-btn {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      opacity: 0.12;
+      font-size: 18px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      z-index: 2001;
+      transition: opacity 0.3s;
+    }
+    .upload-trigger-btn:hover { opacity: 0.6; }
+
+    /* Password Modal Styles */
+    .password-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 4000;
+      justify-content: center;
+      align-items: center;
+    }
+    .password-content {
+      background: #0a0a1a;
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid #00f7ff;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      position: relative;
+    }
+    .password-content h3 { color: white; margin-bottom: 20px; }
+    .password-content input {
+      width: 100%; padding: 12px; background: #111;
+      border: 1px solid #00f7ff; color: #00f7ff;
+      border-radius: 8px; margin-bottom: 15px;
+      outline: none; text-align: center; font-family: inherit;
+    }
+    .password-content .error-msg { color: #ff00c8; font-size: 0.85rem; margin-bottom: 15px; display: none; }
+    .close-pass { position: absolute; top: 15px; right: 15px; color: white; cursor: pointer; font-size: 1.2rem; line-height: 1; }
+    .shake { animation: shake 0.4s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Centered Upload Panel */
+    .upload-panel {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -45%);
+      flex-direction: column;
+      gap: 20px;
+      padding: 40px;
+      background: #0a0a1a;
+      border-radius: 24px;
+      border: 2px solid #00f7ff;
+      align-items: center;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      z-index: 2000;
+    }
+    .upload-panel.active { 
+      display: flex; 
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -40%); }
+      to { opacity: 1; transform: translate(-50%, -45%); }
+    }
+
+    .upload-btn-group {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    #triggerFileBtn {
+      background: transparent;
+      border: 2px solid #ff00c8;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #triggerFileBtn:hover {
+      background: rgba(255, 0, 200, 0.1);
+    }
+
+    #uploadGalleryBtn {
+      background: #00f7ff;
+      color: #050816;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #uploadGalleryBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .uploaded-badge {
+      background: #00ff00;
+      color: #050816;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-height: 150px;
+      overflow-y: auto;
+      padding: 5px;
+    }
+    .preview-item { 
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #ff00c8;
+    }
+
+    /* Full Screen Slideshow */
+    .slideshow-section {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 80px);
+      overflow: hidden;
+      background: #080818;
+      z-index: 0;
+    }
+    .slideshow-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%; /* Fill parent slideshow-section */
+      height: 100%; /* Fill parent slideshow-section */
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 0;
+    }
+    .slide.active {
+      opacity: 1;
+      z-index: 1;
+    }
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: #080818;
+    }
+    .slide-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+    .slide-name {
+      display: none; /* No file names shown */
+    }
+    .admin-del-overlay {
+      position: absolute;
+      top: 20px; right: 20px;
+      z-index: 50;
+    }
+    .del-btn { background: rgba(255,0,0,0.6); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+
+    .ss-btn {
+      opacity: 0;
+      position: absolute;
+      top: 50%; 
+      transform: translateY(-50%);
+      background: rgba(10, 10, 26, 0.6);
+      color: #00f7ff;
+      border: 1px solid rgba(0, 247, 255, 0.2);
+      width: 45px;
+      height: 60px;
+      cursor: pointer;
+      font-size: 2rem;
+      z-index: 10;
+      transition: 0.3s;
+    }
+    .slideshow-section:hover .ss-btn { opacity: 1; }
+    .ss-btn:hover {
+      background: rgba(0, 247, 255, 0.4);
+    }
+
+    @media (max-width: 600px) {
+      .ss-btn {
+        width: 60px; /* Wider buttons for mobile navigation */
+        height: 80px;
+      }
+    }
+
+    .ss-prev { left: 0; border-radius: 0 8px 8px 0; }
+    .ss-next { right: 0; border-radius: 8px 0 0 8px; }
+    .ss-dots {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    .ss-dot {
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .ss-dot.active {
+      background: #00f7ff;
+      width: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #00f7ff;
+    }
+
+    /* Empty State Message */
+    #emptyGalleryMsg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: none;
+      z-index: 1001;
+    }
+
+    .upload-progress-container {
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        margin-top: 10px;
+        display: none;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Lightbox Styles */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .lightbox.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .lightbox img {
+      max-width: 95%; /* Slightly larger for better viewing */
+      max-height: 95%; /* Slightly larger for better viewing */
+      object-fit: contain; /* Ensure entire image is visible */
+      border-radius: 10px;
+    }
+    .lightbox-button {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: background 0.3s ease;
+    }
+    .lightbox-button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+    .lightbox-close { top: 20px; right: 20px; }
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+    .lightbox-caption {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #00f7ff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: rgba(10, 10, 26, 0.8);
+      padding: 10px 20px;
+      border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gallery-header">
+    <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    <h2>My Graphics Portfolio</h2>
+    <div style="width: 140px;" class="header-spacer"></div> 
+  </div>
+
+  <button class="upload-trigger-btn" onclick="openPasswordModal()">⚙</button>
+
+  <!-- Password Modal -->
+  <div id="passwordModal" class="password-modal">
+    <div class="password-content" id="passwordContent">
+      <span class="close-pass" onclick="closePasswordModal()">✕</span>
+      <h3>Admin Access</h3>
+      <input type="password" id="adminPassword" placeholder="Enter Password">
+      <div id="passwordError" class="error-msg">Incorrect password. Try again.</div>
+      <button onclick="checkPassword()" class="btn primary-btn" style="width: 100%;">Enter</button>
+    </div>
+  </div>
+
+  <section id="slideshowSection" class="slideshow-section">
+    <div id="slideshowContainer" class="slideshow-container">
+    </div>
+    <button class="ss-btn ss-prev" onclick="moveSS(-1)">‹</button>
+    <button class="ss-btn ss-next" onclick="moveSS(1)">›</button>
+    <div id="slideshowDots" class="ss-dots"></div>
+    <div id="emptyGalleryMsg">
+      <h3 style="color: #00f7ff; font-size: 1.8rem;">No images yet.</h3>
+      <p style="color: white; opacity: 0.7;">Click the upload button to get started.</p>
+    </div>
+  </section>
+
+  <!-- Upload Interface -->
+  <div id="uploadPanel" class="upload-panel">
+    <i class="fas fa-images" style="color: #00f7ff; font-size: 3rem; margin-bottom: 5px;"></i>
+    <h3 style="color: white; font-size: 1.5rem;">Update Portfolio</h3>
+    <input type="file" id="galleryImageUpload" name="galleryImages" multiple accept="image/*" hidden>
+    <div class="upload-btn-group">
+        <button type="button" id="triggerFileBtn" class="btn secondary-btn" style="padding: 12px 20px;"><i class="fas fa-folder-open"></i> Select Images</button>
+        <button type="button" id="uploadGalleryBtn" class="btn primary-btn" style="padding: 12px 20px;"><i class="fas fa-upload"></i> Upload Now</button>
+    </div>
+    <div id="uploadedBadge" class="uploaded-badge" style="margin-top: 5px;">✓ Uploaded!</div>
+    <div id="uploadPreview" class="preview-container"></div>
+    
+    <div class="upload-progress-container" id="progCont">
+        <div id="progBar" style="height:100%; width:0%; background:#00f7ff; transition:0.3s;"></div>
+    </div>
+
+    <a href="javascript:void(0)" onclick="closeUploadPanel()" style="color: #666; font-size: 0.8rem; text-decoration: none; margin-top: 10px;">✕ Close Panel</a>
+    <p id="galleryUploadStatus" style="font-size: 0.9rem; color: #00f7ff; font-weight: 600; min-height: 1.2em;"></p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const uploadPanel = document.getElementById('uploadPanel');
+      const fileInp = document.getElementById('galleryImageUpload');
+      const previewArea = document.getElementById('uploadPreview');
+      const ssContainer = document.getElementById('slideshowContainer');
+      const ssDots = document.getElementById('slideshowDots');
+      const emptyMsg = document.getElementById('emptyGalleryMsg');
+      const badge = document.getElementById('uploadedBadge');
+      const status = document.getElementById('galleryUploadStatus');
+      const uploadBtn = document.getElementById('uploadGalleryBtn');
+      
+      let images = []; 
+      let ssIndex = 0; 
+      let ssInterval = null;
+      let pendingFiles = [];
+      let currentIndex = 0;
+
+      // START OF REPLACEMENT INDEXEDDB & UPLOAD LOGIC
+      let db;
+      const DB_NAME = 'GalleryDB';
+      const STORE = 'imgs';
+
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const r = indexedDB.open(DB_NAME, 2);
+          r.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (db.objectStoreNames.contains(STORE)) {
+              db.deleteObjectStore(STORE);
+            }
+            db.createObjectStore(STORE, {autoIncrement: true, keyPath: null});
+          };
+          r.onsuccess = () => resolve(r.result);
+          r.onerror = () => reject(r.error);
+        });
+      }
+
+      async function uploadNow() {
+        if (!pendingFiles.length) return alert('Please select some images first.');
+        uploadBtn.disabled = true;
+        try {
+          db = await openDB();
+          for (const file of pendingFiles) {
+            await new Promise((resolve, reject) => {
+              const tx = db.transaction(STORE, 'readwrite');
+              tx.objectStore(STORE).add({b:file, n:file.name});
+              tx.oncomplete = resolve;
+              tx.onerror = () => reject(tx.error);
+            });
+          }
+          await loadGallery();
+          showSuccess('✓ Uploaded!');
+          setTimeout(() => closeUploadPanel(), 1000);
+        } catch(e) {
+          console.error(e);
+          showError('Failed: ' + e.message);
+        } finally {
+          uploadBtn.disabled = false;
+        }
+      }
+
+      async function loadGallery() {
+        try {
+          db = await openDB();
+          const tx = db.transaction(STORE, 'readonly');
+          const all = await new Promise(r => { 
+            const req = tx.objectStore(STORE).getAll(); 
+            req.onsuccess = () => r(req.result); 
+          });
+          
+          clearSlideshow();
+          
+          // Filter out the specific Red Bull Formula 1 race car image (white background, ESSO/RedBull F1 car)
+          const filteredImages = all.reverse().filter(img => {
+            const fileName = (img.n || "").toLowerCase();
+            return !fileName.includes('redbull') && !fileName.includes('esso') && !fileName.includes('f1');
+          });
+
+          if (filteredImages.length === 0) {
+            emptyMsg.style.display = 'block';
+            return;
+          }
+          emptyMsg.style.display = 'none';
+
+          filteredImages.forEach((r, i) => addSlide(URL.createObjectURL(r.b), r.n, i === 0));
+          updateSS();
+          startSS();
+        } catch (e) {
+          console.error("Load failed:", e);
+        }
+      }
+
+      function showSuccess(msg) {
+        status.innerText = msg;
+        status.style.color = "#00ff00";
+        badge.style.display = 'block';
+        badge.style.opacity = '1';
+        setTimeout(() => {
+          badge.style.opacity = '0';
+          setTimeout(() => { badge.style.display = 'none'; }, 500);
+        }, 3000);
+      }
+
+      function showError(msg) {
+        status.innerText = msg;
+        status.style.color = "#ff6b9f";
+      }
+
+      function clearSlideshow() {
+        ssContainer.innerHTML = '';
+        ssDots.innerHTML = '';
+        images.forEach(img => URL.revokeObjectURL(img.src));
+        images = [];
+        ssIndex = 0;
+        stopSS();
+      }
+
+      function addSlide(url, name, isFirst) {
+        const index = images.length;
+        images.push({ src: url, name: name });
+
+        const slide = document.createElement('div');
+        slide.className = 'slide' + (isFirst ? ' active' : '');
+        slide.innerHTML = `<img src="${url}" alt="${name}">`;
+        ssContainer.appendChild(slide);
+
+        const dot = document.createElement('div');
+        dot.className = 'ss-dot' + (isFirst ? ' active' : '');
+        dot.onclick = () => setSS(index);
+        ssDots.appendChild(dot);
+      }
+
+      // Password Modal Logic
+      window.openPasswordModal = () => {
+        document.getElementById('passwordModal').style.display = 'flex';
+        document.getElementById('adminPassword').focus();
+      };
+
+      window.closePasswordModal = () => {
+        document.getElementById('passwordModal').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+      };
+
+      window.checkPassword = () => {
+        const passInp = document.getElementById('adminPassword');
+        const errorMsg = document.getElementById('passwordError');
+        const content = document.getElementById('passwordContent');
+        
+        if (passInp.value === '7232') {
+          closePasswordModal();
+          openUploadPanel();
+        } else {
+          errorMsg.style.display = 'block';
+          passInp.classList.add('shake');
+          setTimeout(() => passInp.classList.remove('shake'), 400);
+          passInp.value = '';
+        }
+      };
+
+      window.openUploadPanel = () => uploadPanel.classList.add('active');
+
+      window.closeUploadPanel = () => {
+        uploadPanel.classList.remove('active');
+        pendingFiles = [];
+        previewArea.innerHTML = '';
+        status.innerText = "";
+      };
+
+      document.getElementById('triggerFileBtn').onclick = () => fileInp.click();
+      fileInp.onchange = (e) => {
+        pendingFiles = Array.from(e.target.files);
+        previewArea.innerHTML = '';
+        pendingFiles.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.className = 'preview-item';
+            previewArea.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      };
+
+      document.getElementById('uploadGalleryBtn').onclick = uploadNow;
+
+      function startSS() {
+        stopSS();
+        if (images.length > 1) ssInterval = setInterval(() => moveSS(1), 4000);
+      }
+      function stopSS() { clearInterval(ssInterval); }
+      
+      window.moveSS = (n) => {
+        if (images.length === 0) return;
+        ssIndex = (ssIndex + n + images.length) % images.length;
+        updateSS();
+      };
+      window.setSS = (n) => { ssIndex = n; updateSS(); };
+      
+      function updateSS() {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.ss-dot');
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === ssIndex);
+        });
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === ssIndex);
+        });
+      }
+
+      document.getElementById('slideshowSection').onmouseenter = stopSS;
+      document.getElementById('slideshowSection').onmouseleave = startSS;
+
+      window.addEventListener('keydown', (e) => {
+        if (uploadPanel.classList.contains('active') && e.key === 'Escape') {
+          closeUploadPanel();
+        }
+      });
+
+      // INITIAL LOAD
+      loadGallery();
+    });
+  </script>
+
+  <!-- Link the main JavaScript for the custom cursor -->
+  <script src="java.js"></script>
+</body>
+</html>

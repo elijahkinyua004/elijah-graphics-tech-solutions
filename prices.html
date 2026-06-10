@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Rates | Elijah Graphics & Tech Solutions</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .prices-page {
+      padding: 150px 8% 80px;
+      min-height: 100vh;
+    }
+    .price-table-container {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 40px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th {
+      background: rgba(0, 247, 255, 0.1);
+      color: #00f7ff;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+    tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .price-tag {
+      color: #ff00c8;
+      font-weight: 700;
+    }
+    .back-nav {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo-area">
+        <div class="logo">
+          <svg class="logo-svg" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="logo-grad-prices" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#00f7ff" />
+                <stop offset="100%" style="stop-color:#ff00c8" />
+              </linearGradient>
+            </defs>
+            <path class="draw-path" d="M20,30 H80 V70 H20 Z M30,70 L50,45 L65,60 L80,35" 
+                  fill="none" stroke="url(#logo-grad-prices)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <g class="pen-nib">
+              <path d="M0,0 L-4,-12 L4,-12 Z" fill="#00f7ff" />
+              <rect x="-0.5" y="-12" width="1" height="6" fill="#050816" />
+            </g>
+          </svg>
+        </div>
+        <h2>Elijah Graphics & Tech Solutions</h2>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Back to Portfolio</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="prices-page">
+    <div class="back-nav">
+        <a href="index.html" class="btn secondary-btn">← Back to Home</a>
+    </div>
+
+    <h2 class="section-title" style="text-align: left; margin-bottom: 20px;">Detailed Service Rates</h2>
+    <p style="color: #ccc; margin-bottom: 40px;">Professional solutions tailored to your specific needs and budget.</p>
+
+    <div class="price-table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Service Category</th>
+            <th>Item / Detail</th>
+            <th>Starting Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Graphic Design</strong></td>
+            <td>Custom Branding / Logo Design</td>
+            <td class="price-tag">Ksh 500+</td>
+          </tr>
+          <tr>
+            <td><strong>Large Format</strong></td>
+            <td>Banner Design & Print (Per Meter)</td>
+            <td class="price-tag">Ksh 800+</td>
+          </tr>
+          <tr>
+            <td><strong>Digital Marketing</strong></td>
+            <td>Posters, Flyers, & Social Media Kits</td>
+            <td class="price-tag">Ksh 500</td>
+          </tr>
+          <tr>
+            <td><strong>Gaming</strong></td>
+            <td>PS4 Rental (24 Hours) - Includes FIFA 26, GTA, MK, NFS</td>
+            <td class="price-tag">Ksh 500</td>
+          </tr>
+          <tr>
+            <td><strong>Gaming</strong></td>
+            <td>PS4 Rental (12 Hours Daylight) - Includes FIFA 26, GTA, MK, NFS</td>
+            <td class="price-tag">Ksh 400</td>
+          </tr>
+          <tr>
+            <td><strong>Web & Tech</strong></td>
+            <td>Web Development & Cyber Services</td>
+            <td class="price-tag">Contact for Quote</td>
+          </tr>
+          <tr>
+            <td><strong>Interior Design</strong></td>
+            <td>Interior Designer</td>
+            <td class="price-tag">Contact for Quote</td>
+          </tr>
+          <tr>
+            <td><strong>Event Decor</strong></td>
+            <td>Event Decor Specialist</td>
+            <td class="price-tag">Contact for Quote</td>
+          </tr>
+          <tr>
+            <td><strong>Cake Design</strong></td>
+            <td>Cake Designer & Recipe Creator</td>
+            <td class="price-tag">Contact for Quote</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- Link the main JavaScript for the custom cursor -->
+  <script src="java.js"></script>
+
+</body>
+</html>
