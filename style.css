@@ -827,12 +827,33 @@ body{
 }
 
 .price-list li{
-    padding:9px 0;
-    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap; /* Allows price to wrap on extremely narrow screens */
 }
 
 .price-list li:last-child{
     border-bottom:none;
+}
+
+.price-list li span:first-child {
+    flex: 1;
+    min-width: 140px; /* Ensures description doesn't get too squished */
+    color: #ddd;
+    line-height: 1.4;
+}
+
+.price-list li .price-val {
+    color: #ff00c8; /* Magenta as per description */
+    font-weight: 700;
+    white-space: nowrap;
+    font-size: clamp(0.95rem, 3vw, 1.1rem);
+    margin-left: auto;
+    text-shadow: 0 0 10px rgba(255, 0, 200, 0.2);
 }
 
 .card-action{
@@ -893,7 +914,7 @@ body{
 
 .price-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap:18px;
 }
 
@@ -911,7 +932,7 @@ body{
 .price-item span{
     display:inline-flex;
     align-items:center;
-    justify-content:center;
+    justify-content: center;
     width:38px;
     height:38px;
     margin-bottom:16px;
@@ -923,7 +944,7 @@ body{
 
 .price-item h4{
     color:#ffffff;
-    font-size:1.15rem;
+    font-size: clamp(1rem, 4vw, 1.15rem);
     margin-bottom:10px;
 }
 
@@ -934,7 +955,7 @@ body{
 }
 
 .price-item strong{
-    color:#00f7ff;
+    color: #ff00c8; /* Matched to magenta theme for prices */
 }
 .order-strip{
     max-width:1180px;
@@ -1275,6 +1296,20 @@ footer{
     .nav-links{
         flex-wrap:wrap;
         justify-content:center;
+    }
+
+    /* Stack the price list on small mobiles */
+    @media (max-width: 480px) {
+        .price-list li {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .price-list li .price-val {
+            margin-left: 0;
+            align-self: flex-end; /* Keeps price on the right but below the text */
+        }
+    }
     }
 }
 
